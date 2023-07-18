@@ -70,4 +70,74 @@ public class StatusTest {
                 .statusCode(200)
                 .body("total", is(20));
     }
+
+    @Test
+    void checkChromeVersion() {
+        given()
+                .log().uri()
+                .when()
+                .get("https://selenoid.autotests.cloud/status")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(200)
+                .body("browsers.chrome", hasKey("100.0"));
+    }
+
+    @Test
+    void checkResponse() {
+        Integer expectedTotal = 20;
+
+        Integer actualTotal = given()
+                .log().uri()
+                .when()
+                .get("https://selenoid.autotests.cloud/status")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(200)
+                .extract().path("total");
+
+        assertEquals(expectedTotal, actualTotal);
+    }
+
+    @Test
+    void checkWdHubStatus401() {
+        given()
+                .log().uri()
+                .when()
+                .get("https://selenoid.autotests.cloud/wd/hub/status")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(401);
+    }
+
+    @Test
+    void checkWdHubStatus() {
+        given()
+                .log().uri()
+                .when()
+                .get("https://user1:1234@selenoid.autotests.cloud/wd/hub/status")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(200)
+                .body("value.ready", is(true));
+    }
+
+    @Test
+    void checkWdHubStatusWithAuth() {
+        given()
+                .log().uri()
+                .auth().basic("user1", "1234")
+                .when()
+                .get("https://selenoid.autotests.cloud/wd/hub/status")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(200)
+                .body("value.ready", is(true));
+    }
+
 }
