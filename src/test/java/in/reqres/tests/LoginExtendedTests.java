@@ -8,6 +8,8 @@ import io.qameta.allure.Step;
 import io.qameta.allure.restassured.AllureRestAssured;
 import org.junit.jupiter.api.Test;
 
+import static in.reqres.specs.LoginSpec.loginRequestSpec;
+import static in.reqres.specs.LoginSpec.loginResponseSpec;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -232,5 +234,26 @@ public class LoginExtendedTests {
 
         step("check response", () ->
                     assertEquals("QpwL5tke4Pnpja7X4", loginResponse.getToken()));
+    }
+
+    @Test
+    void successfulLoginWithSpecsTest() {
+        LoginBodyLombokModel authData = new LoginBodyLombokModel();
+        authData.setEmail("eve.holt@reqres.in");
+        authData.setPassword("cityslicka");
+
+
+        LoginResponseLombokModel loginResponse = step("Make request", () ->
+                given(loginRequestSpec)
+                        .body(authData)
+                        .when()
+                        .post("/login")
+                        .then()
+                        .spec(loginResponseSpec)
+                        .extract().as(LoginResponseLombokModel.class));
+
+
+        step("check response", () ->
+                assertEquals("QpwL5tke4Pnpja7X4", loginResponse.getToken()));
     }
 }
