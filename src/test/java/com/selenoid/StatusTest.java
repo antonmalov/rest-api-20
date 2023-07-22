@@ -140,4 +140,16 @@ public class StatusTest {
                 .body("value.ready", is(true));
     }
 
+    @Test
+    void checkChromeVersionWithJsonSchema() {
+        given()
+                .log().uri()
+                .when()
+                .get("https://selenoid.autotests.cloud/status")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(200)
+                .body("browsers.chrome", hasKey("100.0"));
+    }
 }

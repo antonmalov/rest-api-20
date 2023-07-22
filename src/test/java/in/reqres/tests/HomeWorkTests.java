@@ -1,9 +1,12 @@
 package in.reqres.tests;
 
+import in.reqres.models.lombok.UserData;
+import io.qameta.allure.restassured.AllureRestAssured;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.is;
@@ -14,22 +17,35 @@ public class HomeWorkTests {
 
     @Test
     void getUserWithId2() {
-        given()
+        UserData userResponse = step("Make request", () ->
+
+                given()
                 .log().uri()
                 .log().method()
-                .log().body()
+                .log().body().filter(new AllureRestAssured())
                 .when()
                 .get("https://reqres.in/api/users/2")
                 .then()
                 .log().status()
                 .log().body()
                 .statusCode(200)
-                .body("data.id", is(2))
-                .body("data.first_name", is("Janet"))
-                .body("data.last_name", is("Weaver"))
-                .body("data.last_name", is("Weaver"))
-                .body("data.avatar", is("https://reqres.in/img/faces/2-image.jpg"));
+                .extract().as(UserData.class));
+
+        step("check response", () -> {
+            assertEquals(2, userResponse.getData().getId());
+            assertEquals("Janet", userResponse.getData().getFirstName());
+            assertEquals("Weaver", userResponse.getData().getLastName());
+            assertEquals("https://reqres.in/img/faces/2-image.jpg", userResponse.getData().getAvatar());
+        });
     }
+
+
+
+//    .body("data.id", is(2))
+//            .body("data.first_name", is("Janet"))
+//            .body("data.last_name", is("Weaver"))
+//            .body("data.last_name", is("Weaver"))
+//            .body("data.avatar", is("https://reqres.in/img/faces/2-image.jpg"))
 
     @Test
     void getListUsers() {
