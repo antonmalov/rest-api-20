@@ -1,11 +1,11 @@
 package in.reqres.tests;
 
-import in.reqres.models.lombok.UserData;
-import io.qameta.allure.restassured.AllureRestAssured;
+import in.reqres.models.lombok.homeworkmodel.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static in.reqres.specs.HomeWorkSpecs.*;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -18,17 +18,11 @@ public class HomeWorkTests {
     @Test
     void getUserWithId2() {
         UserData userResponse = step("Make request", () ->
-
-                given()
-                .log().uri()
-                .log().method()
-                .log().body().filter(new AllureRestAssured())
+                given(getUserRequestSpec)
                 .when()
-                .get("https://reqres.in/api/users/2")
+                .get("/users/2")
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(200)
+                .spec(getUserResponseSpec)
                 .extract().as(UserData.class));
 
         step("check response", () -> {
@@ -39,121 +33,99 @@ public class HomeWorkTests {
         });
     }
 
-
-
-//    .body("data.id", is(2))
-//            .body("data.first_name", is("Janet"))
-//            .body("data.last_name", is("Weaver"))
-//            .body("data.last_name", is("Weaver"))
-//            .body("data.avatar", is("https://reqres.in/img/faces/2-image.jpg"))
-
     @Test
     void getListUsers() {
 
-        List<Integer> actualSize = given()
-                .log().uri()
-                .log().method()
-                .log().body()
+        List<Integer> actualSize = step("Make request", () ->
+                given(getUserRequestSpec)
                 .when()
-                .get("https://reqres.in/api/users?page=2")
+                .get("/users?page=2")
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(200)
-                .extract().path("data.id");
+                .spec(getUserResponseSpec)
+                .extract().path("data.id"));
 
-        assertEquals(6, actualSize.size());
+        step("Check response", () ->
+        assertEquals(6, actualSize.size()));
     }
 
     @Test
     void creteUserSuccess() {
-        String requestData = "{ \"name\": \"morpheus\", \"job\": \"leader\" }";
+        RequestUserModel requestData = new RequestUserModel();
+        requestData.setName("morpheus");
+        requestData.setJob("leader");
 
-        given()
-                .log().uri()
-                .log().method()
-                .log().body()
-                .contentType(JSON)
+        ResponseCreateUserModel responseUser = step("Make request", () ->
+                given(userRequestSpec)
                 .body(requestData)
                 .when()
-                .post("https://reqres.in/api/users")
+                .post("/users")
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(201)
-                .body("name", is("morpheus"))
-                .body("job", is("leader"));
+                .spec(createUserResponseSpec)
+                .extract().as(ResponseCreateUserModel.class));
+
+        step("check response", () -> {
+            assertEquals("morpheus", responseUser.getName());
+            assertEquals("leader", responseUser.getJob());
+        });
     }
 
     @Test
     void updateUserSuccess() {
-        String requestData = "{ \"name\": \"morpheus\", \"job\": \"zion resident\" }";
+        RequestUserModel requestData = new RequestUserModel();
+        requestData.setName("morpheus");
+        requestData.setJob("zion resident");
 
-        given()
-                .log().uri()
-                .log().method()
-                .log().body()
-                .contentType(JSON)
+        ResponseUpdateUserModel responseUser = step("Make request", () ->
+                given(userRequestSpec)
                 .body(requestData)
                 .when()
-                .put("https://reqres.in/api/users/2")
+                .put("/users/2")
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(200)
-                .body("name", is("morpheus"))
-                .body("job", is("zion resident"));
+                .spec(updateUserResponseSpec)
+                .extract().as(ResponseUpdateUserModel.class));
+
+        step("check response", () -> {
+            assertEquals("morpheus", responseUser.getName());
+            assertEquals("zion resident", responseUser.getJob());
+        });
+
     }
 
     @Test
     void registerSuccessful() {
-        String registerData = "{ \"email\": \"eve.holt@reqres.in\", \"password\": \"pistol\" }";
+        RegisterRequestModel registerData = new RegisterRequestModel();
+        registerData.setEmail("eve.holt@reqres.in");
+        registerData.setPassword("pistol");
 
-        given()
-                .log().uri()
-                .log().method()
-                .log().body()
-                .contentType(JSON)
+        RegisterResponseModel response = step("Make request", () ->
+                given(userRequestSpec)
                 .body(registerData)
                 .when()
-                .post("https://reqres.in/api/register")
+                .post("/register")
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(200)
-                .body("token", is("QpwL5tke4Pnpja7X4"));
+                .spec(registerResponseSpec)
+                .extract().as(RegisterResponseModel.class));
+
+        step("check response", () ->
+                assertEquals("QpwL5tke4Pnpja7X4", response.getToken()));
+
     }
 
     @Test
     void registerUnsuccessful() {
-        String registerData = "{ \"email\": \"sydney@fife\" }";
+        RegisterRequestModel registerData = new RegisterRequestModel();
+        registerData.setEmail("sydney@fife");
 
-        given()
-                .log().uri()
-                .log().method()
-                .log().body()
-                .contentType(JSON)
+        RegisterResponseErrorModel registerResponse = step("Make request", () ->
+                given(userRequestSpec)
                 .body(registerData)
                 .when()
-                .post("https://reqres.in/api/register")
+                .post("/register")
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(400)
-                .body("error", is("Missing password"));
-    }
+                .spec(missingPassword400Spec)
+                .extract().as(RegisterResponseErrorModel.class));
 
-    @Test
-    void getUserNotFound() {
-        given()
-                .log().uri()
-                .log().method()
-                .log().body()
-                .when()
-                .get("https://reqres.in/api/users/23")
-                .then()
-                .log().status()
-                .log().body()
-                .statusCode(404);
+        step("check response", () ->
+                assertEquals("Missing password", registerResponse.getError()));
     }
 }

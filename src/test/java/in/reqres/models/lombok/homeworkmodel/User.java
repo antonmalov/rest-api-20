@@ -1,4 +1,4 @@
-package in.reqres.models.lombok;
+package in.reqres.models.lombok.homeworkmodel;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
