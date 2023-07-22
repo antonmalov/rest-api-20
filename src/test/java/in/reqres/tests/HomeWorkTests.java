@@ -1,6 +1,7 @@
 package in.reqres.tests;
 
 import in.reqres.models.lombok.homeworkmodel.*;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
+@Tag("api")
 public class HomeWorkTests {
 
     @Test
