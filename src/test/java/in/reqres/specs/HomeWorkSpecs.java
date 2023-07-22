@@ -1,6 +1,5 @@
 package in.reqres.specs;
 
-import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
@@ -10,6 +9,7 @@ import static io.restassured.RestAssured.with;
 import static io.restassured.filter.log.LogDetail.BODY;
 import static io.restassured.filter.log.LogDetail.STATUS;
 import static io.restassured.http.ContentType.JSON;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.notNullValue;
 
 public class HomeWorkSpecs {
@@ -26,6 +26,15 @@ public class HomeWorkSpecs {
             .log(STATUS)
             .log(BODY)
             .expectStatusCode(200)
+            .expectBody(matchesJsonSchemaInClasspath("schemas/get-user-schema.json"))
+            .expectBody("data.id", notNullValue())
+            .build();
+
+    public static ResponseSpecification getUsersListResponseSpec = new ResponseSpecBuilder()
+            .log(STATUS)
+            .log(BODY)
+            .expectStatusCode(200)
+            .expectBody(matchesJsonSchemaInClasspath("schemas/get-user-list-schema.json"))
             .expectBody("data.id", notNullValue())
             .build();
 
@@ -42,6 +51,7 @@ public class HomeWorkSpecs {
             .log(STATUS)
             .log(BODY)
             .expectStatusCode(201)
+            .expectBody(matchesJsonSchemaInClasspath("schemas/create-user-schema.json"))
             .expectBody("id", notNullValue())
             .expectBody("createdAt", notNullValue())
             .build();
@@ -50,6 +60,7 @@ public class HomeWorkSpecs {
             .log(STATUS)
             .log(BODY)
             .expectStatusCode(200)
+            .expectBody(matchesJsonSchemaInClasspath("schemas/update-user-schema.json"))
             .expectBody("updatedAt", notNullValue())
             .build();
 
@@ -57,6 +68,7 @@ public class HomeWorkSpecs {
             .log(STATUS)
             .log(BODY)
             .expectStatusCode(200)
+            .expectBody(matchesJsonSchemaInClasspath("schemas/register-schema.json"))
             .expectBody("id", notNullValue())
             .expectBody("token", notNullValue())
             .build();
@@ -65,6 +77,7 @@ public class HomeWorkSpecs {
             .log(STATUS)
             .log(BODY)
             .expectStatusCode(400)
+            .expectBody(matchesJsonSchemaInClasspath("schemas/register-unsuccessfull-schema.json"))
             .expectBody("error", notNullValue())
             .build();
 }

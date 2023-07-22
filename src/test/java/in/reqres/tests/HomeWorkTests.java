@@ -8,8 +8,6 @@ import java.util.List;
 import static in.reqres.specs.HomeWorkSpecs.*;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
-import static io.restassured.http.ContentType.JSON;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -41,7 +39,7 @@ public class HomeWorkTests {
                 .when()
                 .get("/users?page=2")
                 .then()
-                .spec(getUserResponseSpec)
+                .spec(getUsersListResponseSpec)
                 .extract().path("data.id"));
 
         step("Check response", () ->
